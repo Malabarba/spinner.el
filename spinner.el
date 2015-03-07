@@ -131,7 +131,7 @@ is chosen as the spinner type."
          ((symbolp type) (cdr (assq type spinner-types)))
          (t (error "Unknown spinner type: %s" type))))
   (setq spinner--counter 0)
-  
+
   ;; Maybe add to mode-line.
   (unless (memq 'spinner--mode-line-construct mode-line-format)
     (setq mode-line-format (copy-list mode-line-format))
