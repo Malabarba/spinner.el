@@ -1,4 +1,4 @@
-;;; spinner.el --- Mode-line spinner for operations in progress  -*- lexical-binding: t; -*-
+;;; spinner.el --- Add spinners and progress-bars to the mode-line for ongoing operations -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2015  Artur Malabarba
 
