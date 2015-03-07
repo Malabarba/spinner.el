@@ -4,6 +4,7 @@
 
 ;; Author: Artur Malabarba <bruce.connor.am@gmail.com>
 ;; Version: 1.0
+;; URL: https://github.com/Bruce-Connor/spinner.el
 ;; Keywords: processes mode-line
 
 ;; This program is free software; you can redistribute it and/or modify
