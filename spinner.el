@@ -4,6 +4,7 @@
 
 ;; Author: Artur Malabarba <bruce.connor.am@gmail.com>
 ;; Version: 1.0
+;; Package-Requires: ((cl-lib "0.5"))
 ;; URL: https://github.com/Bruce-Connor/spinner.el
 ;; Keywords: processes mode-line
 
@@ -48,6 +49,7 @@
 
 
 ;;; Code:
+(require 'cl-lib)
 
 (defconst spinner-types
   '((3-line-clock . ["┤" "┘" "┴" "└" "├" "┌" "┬" "┐"])
@@ -137,7 +139,7 @@ is chosen as the spinner type."
 
   ;; Maybe add to mode-line.
   (unless (memq 'spinner--mode-line-construct mode-line-format)
-    (setq mode-line-format (copy-list mode-line-format))
+    (setq mode-line-format (cl-copy-list mode-line-format))
     (let ((cell (memq 'mode-line-buffer-identification mode-line-format)))
       (if cell
           (setcdr cell (cons 'spinner--mode-line-construct (cdr cell)))
