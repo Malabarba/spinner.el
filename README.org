@@ -2,7 +2,10 @@
 
 Add spinners and progress-bars to the mode-line for ongoing operations.
 
-[[file:spinner.gif]]
+[[file:some-spinners.gif]]
+
+[[file:all-spinners.gif]]
+
 * Usage
 
 1. Add ~(spinner "1.0")~ to your package’s dependencies.
