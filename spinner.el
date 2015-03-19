@@ -137,6 +137,10 @@ is chosen as the spinner type."
          (t (error "Unknown spinner type: %s" type))))
   (setq spinner--counter 0)
 
+  ;; Ensure `mode-line-format' is a list.
+  (unless (consp mode-line-format)
+    (setq mode-line-format (list "" mode-line-format)))
+
   ;; Maybe add to mode-line.
   (unless (memq 'spinner--mode-line-construct mode-line-format)
     (setq mode-line-format (cl-copy-list mode-line-format))
