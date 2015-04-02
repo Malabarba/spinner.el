@@ -2,10 +2,10 @@
 
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
-;; Author: Artur Malabarba <bruce.connor.am@gmail.com>
+;; Author: Artur Malabarba <emacs@endlessparentheses.com>
 ;; Version: 1.0
 ;; Package-Requires: ((cl-lib "0.5"))
-;; URL: https://github.com/Bruce-Connor/spinner.el
+;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
 ;; This program is free software; you can redistribute it and/or modify
