@@ -8,7 +8,7 @@ Add spinners and progress-bars to the mode-line for ongoing operations.
 
 * Usage
 
-1. Add ~(spinner "1.0")~ to your package’s dependencies.
+1. Add ~(spinner "VERSION")~ to your package’s dependencies.
 
 2. Call ~(spinner-start)~ and a spinner will be added to the mode-line.
 

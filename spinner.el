@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.1
+;; Version: 1.2
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
@@ -25,7 +25,7 @@
 ;; 1 Usage
 ;; ═══════
 ;;
-;; 1. Add `(spinner "1.1")' to your package’s dependencies.
+;; 1. Add `(spinner "VERSION")' to your package’s dependencies.
 ;;
 ;; 2. Call `(spinner-start)' and a spinner will be added to the
 ;; mode-line.
@@ -175,9 +175,7 @@ is chosen as the spinner type."
   (when (timerp spinner--timer)
     (cancel-timer spinner--timer))
   (setq spinner--timer nil
-        spinner-current nil)
-  (setq mode-line-format
-        (remove 'spinner--mode-line-construct mode-line-format)))
+        spinner-current nil))
 
 (provide 'spinner)
 
