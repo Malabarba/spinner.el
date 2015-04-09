@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.0
+;; Version: 1.1
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
@@ -25,7 +25,7 @@
 ;; 1 Usage
 ;; ═══════
 ;;
-;; 1. Add `(spinner "1.0")' to your package’s dependencies.
+;; 1. Add `(spinner "1.1")' to your package’s dependencies.
 ;;
 ;; 2. Call `(spinner-start)' and a spinner will be added to the
 ;; mode-line.
@@ -104,7 +104,7 @@ Applications can override this value.")
 
 ;;; The main function
 ;;;###autoload
-(defun spinner-start (&optional type fps)
+(defun spinner-start (&optional type fps noadd)
   "Start a mode-line spinner of given TYPE.
 Spinners are buffer local. It is added to the mode-line in the
 buffer where `spinner-start' is called.
@@ -115,6 +115,11 @@ buffer where the spinner was created.
 
 FPS, if given, is the number of desired frames per second.
 Default is `spinner-frames-per-second'.
+
+If NOADD is non-nil, the spinner is not added to the mode-line.
+It is then your responsibility to add the symbol
+`spinner--mode-line-construct' somewhere in the mode-line,
+probably as part of a minor-mode lighter.
 
 If TYPE is nil, use the first element of `spinner-types'.
 If TYPE is `random', use a random element of `spinner-types'.
@@ -138,12 +143,11 @@ is chosen as the spinner type."
   (setq spinner--counter 0)
 
   ;; Maybe add to mode-line.
-  (unless (memq 'spinner--mode-line-construct mode-line-format)
-    (setq mode-line-format (cl-copy-list mode-line-format))
-    (let ((cell (memq 'mode-line-buffer-identification mode-line-format)))
-      (if cell
-          (setcdr cell (cons 'spinner--mode-line-construct (cdr cell)))
-        (setcdr (last mode-line-format) '(spinner--mode-line-construct)))))
+  (unless (or noadd
+              (memq 'spinner--mode-line-construct mode-line-process))
+    (setq mode-line-process
+          (list (or mode-line-process "")
+                'spinner--mode-line-construct)))
 
   ;; Create timer.
   (when (timerp spinner--timer)
