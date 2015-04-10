@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.2
+;; Version: 1.2.1
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
@@ -120,16 +120,20 @@ vector, the spinner itself.")
   "Make a mode-line spinner construct, using symbol SPINNER-VAR.
 SPINNER-VAR is the name of the variable holding the spinner type
 to be used (one of the cdr's in `spinner-types').  To st"
-  `((,spinner-var
-     (" "
-      (:eval (elt ,spinner-var
-                  (% spinner--counter
-                     (length ,spinner-var)))))
-     (,timer-var
-      (:eval (spinner-stop ,spinner-var ,timer-var))))))
+  `(,spinner-var
+    (:eval (elt ,spinner-var
+                (% spinner--counter
+                   (length ,spinner-var))))
+    (,timer-var
+     (:eval (spinner-stop ',spinner-var ',timer-var)))))
 
 (defconst spinner--mode-line-construct
-  (spinner-make-construct 'spinner-current 'spinner--timer)
+  '(spinner-current
+    (" " (:eval (elt spinner-current
+                     (% spinner--counter
+                        (length spinner-current)))))
+    (spinner--timer
+     (:eval (spinner-stop 'spinner-current 'spinner--timer))))
   "Construct used to display the spinner.")
 (put 'spinner--mode-line-construct 'risky-local-variable t)
 
@@ -143,7 +147,7 @@ Applications can override this value.")
 
 
 ;;; The main functions
-(defun spinner-start-timer (fps spinner-var timer-var)
+(defun spinner-start-timer (spinner-var timer-var &optional fps)
   "Start a spinner timer at FPS frames per second.
 SPINNER-VAR is the name of the variable holding the spinner type,
 and TIMER-VAR is the name of the variable that will be used to
@@ -217,7 +221,7 @@ is chosen as the spinner type."
                 'spinner--mode-line-construct)))
 
   ;; Create timer.
-  (spinner-start-timer fps 'spinner-current 'spinner--timer))
+  (spinner-start-timer 'spinner-current 'spinner--timer fps))
 
 (defun spinner-stop (&optional spinner-var timer-var)
   "Stop the current buffer's spinner."
