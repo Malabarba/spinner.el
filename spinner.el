@@ -25,28 +25,62 @@
 ;; 1 Usage
 ;; ═══════
 ;;
-;; 1. Add `(spinner "VERSION")' to your package’s dependencies.
-;;
-;; 2. Call `(spinner-start)' and a spinner will be added to the
-;; mode-line.
-;;
-;; 3. Call `(spinner-stop)' on the same buffer when you want to remove
-;; it.
+;;   First of all, don’t forget to add `(spinner "VERSION")' to your
+;;   package’s dependencies.
 ;;
 ;;
-;; 2 Behavior
-;; ══════════
+;; 1.1 Major-modes
+;; ───────────────
 ;;
-;; The default spinner is a line drawing that rotates. You can pass an
-;; argument to `spinner-start' to specify which spinner you want. All
-;; possibilities are listed in the `spinner-types' variable, but here are
-;; a few examples for you to try:
+;;   1. Just call `(spinner-start)' and a spinner will be added to the
+;;      mode-line.
+;;   2. Call `(spinner-stop)' on the same buffer when you want to remove
+;;      it.
 ;;
-;; • `(spinner-start 'vertical-breathing 10)'
-;; • `(spinner-start 'minibox)'
-;; • `(spinner-start 'moon)'
-;; • `(spinner-start 'triangle)'
-
+;;   The default spinner is a line drawing that rotates. You can pass an
+;;   argument to `spinner-start' to specify which spinner you want. All
+;;   possibilities are listed in the `spinner-types' variable, but here are
+;;   a few examples for you to try:
+;;
+;;   • `(spinner-start 'vertical-breathing 10)'
+;;   • `(spinner-start 'minibox)'
+;;   • `(spinner-start 'moon)'
+;;   • `(spinner-start 'triangle)'
+;;
+;;   You can also define your own as a vector of strings (see the examples
+;;   in `spinner-types').
+;;
+;;
+;; 1.2 Minor-modes
+;; ───────────────
+;;
+;;   Minor-modes can create a spinner (that can be added to the mode’s
+;;   lighter) with `spinner-make-construct'. They can then start the
+;;   spinner by setting a variable and calling `spinner-start-timer'.
+;;   Finally, they can stop the spinner (and the timer) by just setting the
+;;   same variable to nil.
+;;
+;;   Here’s an example for a minor-mode named `foo'.
+;;   ┌────
+;;   │ (defvar foo--spinner nil)
+;;   │ (defvar foo--timer nil)
+;;   │ (defconst foo--lighter
+;;   │   (list " foo"
+;;   │         (spinner-make-construct 'foo--spinner 'foo--timer)))
+;;   │
+;;   │ (defun foo--start-spinning ()
+;;   │   "Start foo's spinner."
+;;   │   (setq foo--spinner
+;;   │         (cdr (assq 'horizontal-bar spinner-types)))
+;;   │   (spinner-start-timer 'foo--spinner 'foo--timer))
+;;   │
+;;   │ (defun foo--stop-spinning ()
+;;   │   "Stop foo's spinner"
+;;   │   (setq foo--spinner nil))
+;;   └────
+;;
+;;   This will use the `horizontal-bar' spinner, but you can use anything
+;;   defined in the `spinner-types' variable, or even define your own.
 
 ;;; Code:
 (require 'cl-lib)
