@@ -28,32 +28,44 @@ You can also define your own as a vector of strings (see the examples
 in ~spinner-types~).
 
 ** Minor-modes
-Minor-modes can create a spinner (that can be added to the mode’s
-lighter) with ~spinner-make-construct~. They can then start the
-spinner by setting a variable and calling ~spinner-start-timer~.
-Finally, they can stop the spinner (and the timer) by just setting the
-same variable to nil.
+Minor-modes can create a spinner with ~make-spinner~ and then add it
+to their mode-line lighter. They can then start the spinner by setting
+a variable and calling ~spinner-start-timer~. Finally, they can stop
+the spinner (and the timer) by just setting the same variable to nil.
 
-Here’s an example for a minor-mode named ~foo~.
+Here’s an example for a minor-mode named ~foo~. Assuming that
+~foo--lighter~ is used as the mode-line lighter, the following code
+will add an *inactive* global spinner to the mode-line.
 #+begin_src emacs-lisp
-(defvar foo--spinner nil)
-(defvar foo--timer nil)
+(defvar foo--spinner (make-spinner 'rotating-line))
 (defconst foo--lighter
-  (list " foo"
-        (spinner-make-construct 'foo--spinner 'foo--timer)))
-
-(defun foo--start-spinning ()
-  "Start foo's spinner."
-  (setq foo--spinner
-        (cdr (assq 'horizontal-bar spinner-types)))
-  (spinner-start-timer 'foo--spinner 'foo--timer))
-
-(defun foo--stop-spinning ()
-  "Stop foo's spinner"
-  (setq foo--spinner nil))
+  '(" foo" (:eval (spinner-print foo--spinner))))
 #+end_src
 
-This will use the ~horizontal-bar~ spinner, but you can use anything
-defined in the ~spinner-types~ variable, or even define your own.
+1. To activate the spinner, just call ~(spinner-start foo--spinner)~.
+   It will show up on the mode-line and start animating.
+2. To get rid of it, call ~(spinner-stop foo--spinner)~. It will then
+   disappear again.
+
+Some minor-modes will need spinners to be buffer-local. To achieve
+that, just make the ~foo--spinner~ variable buffer-local and use the
+third argument of the ~make-spinner~ function. The snippet below is an example. 
+
+#+begin_src emacs-lisp
+(defvar-local foo--spinner nil)
+(defconst foo--lighter
+  '(" foo" (:eval (spinner-print foo--spinner))))
+(defun foo--start-spinner ()
+  "Create and start a spinner on this buffer."
+  (unless foo--spinner
+    (setq foo--spinner (make-spinner 'moon t)))
+  (spinner-start foo--spinner))
+#+end_src
+
+1. To activate the spinner, just call ~(foo--start-spinner)~.
+2. To get rid of it, call ~(spinner-stop foo--spinner)~.
+
+This will use the ~moon~ spinner, but you can use any of the names
+defined in the ~spinner-types~ variable or even define your own.
 
 
