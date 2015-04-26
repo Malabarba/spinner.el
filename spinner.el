@@ -280,6 +280,12 @@ Default is `spinner-frames-per-second'."
   (when fps (setf (spinner--fps type-or-object) fps))
   (spinner--start-timer type-or-object))
 
+(defun spinner-start-print (spinner)
+  "Like `spinner-print', but also start SPINNER if it's not active."
+  (unless (spinner--active-p spinner)
+    (spinner-start spinner))
+  (spinner-print spinner))
+
 (defun spinner-stop (&optional spinner)
   "Stop the current buffer's spinner."
   (let* ((spinner (or spinner spinner-current))
