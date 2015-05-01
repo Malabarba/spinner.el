@@ -166,11 +166,11 @@ own spinner animations."
    (t (error "Unknown spinner type: %s" type))))
 
 ;;;###autoload
-(defstruct (spinner
-            (:copier nil)
-            (:conc-name spinner--)
-            (:constructor make-spinner (&optional type buffer-local fps)
-                          "Create a spinner of the given TYPE.
+(cl-defstruct (spinner
+               (:copier nil)
+               (:conc-name spinner--)
+               (:constructor make-spinner (&optional type buffer-local fps)
+                             "Create a spinner of the given TYPE.
 The possible TYPEs are described in `spinner--type-to-frames'.
 
 FPS, if given, is the number of desired frames per second.
