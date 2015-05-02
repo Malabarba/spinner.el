@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.3
+;; Version: 1.3.1
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -54,7 +54,7 @@
 ;; 1.2 Minor-modes
 ;; ───────────────
 ;;
-;;   Minor-modes can create a spinner with `make-spinner' and then add it
+;;   Minor-modes can create a spinner with `spinner-create' and then add it
 ;;   to their mode-line lighter. They can then start the spinner by setting
 ;;   a variable and calling `spinner-start-timer'. Finally, they can stop
 ;;   the spinner (and the timer) by just setting the same variable to nil.
@@ -63,7 +63,7 @@
 ;;   `foo--lighter' is used as the mode-line lighter, the following code
 ;;   will add an *inactive* global spinner to the mode-line.
 ;;   ┌────
-;;   │ (defvar foo--spinner (make-spinner 'rotating-line))
+;;   │ (defvar foo--spinner (spinner-create 'rotating-line))
 ;;   │ (defconst foo--lighter
 ;;   │   '(" foo" (:eval (spinner-print foo--spinner))))
 ;;   └────
@@ -75,7 +75,7 @@
 ;;
 ;;   Some minor-modes will need spinners to be buffer-local. To achieve
 ;;   that, just make the `foo--spinner' variable buffer-local and use the
-;;   third argument of the `make-spinner' function. The snippet below is an
+;;   third argument of the `spinner-create' function. The snippet below is an
 ;;   example.
 ;;
 ;;   ┌────
@@ -85,7 +85,7 @@
 ;;   │ (defun foo--start-spinner ()
 ;;   │   "Create and start a spinner on this buffer."
 ;;   │   (unless foo--spinner
-;;   │     (setq foo--spinner (make-spinner 'moon t)))
+;;   │     (setq foo--spinner (spinner-create 'moon t)))
 ;;   │   (spinner-start foo--spinner))
 ;;   └────
 ;;
@@ -165,12 +165,23 @@ own spinner animations."
    ((symbolp type) (cdr (assq type spinner-types)))
    (t (error "Unknown spinner type: %s" type))))
 
-;;;###autoload
 (defstruct (spinner
             (:copier nil)
             (:conc-name spinner--)
-            (:constructor make-spinner (&optional type buffer-local fps)
-                          "Create a spinner of the given TYPE.
+            (:constructor make-spinner (&optional type buffer-local fps)))
+  (frames (spinner--type-to-frames type))
+  (counter 0)
+  (fps spinner-frames-per-second)
+  (timer (timer-create) :read-only)
+  (active-p nil)
+  (buffer (when buffer-local
+            (if (bufferp buffer-local)
+                buffer-local
+              (current-buffer)))))
+
+;;;###autoload
+(defun spinner-create (&optional type buffer-local fps)
+  "Create a spinner of the given TYPE.
 The possible TYPEs are described in `spinner--type-to-frames'.
 
 FPS, if given, is the number of desired frames per second.
@@ -184,16 +195,8 @@ When started, in order to function properly, the spinner runs a
 timer which periodically calls `force-mode-line-update' in the
 curent buffer.  If BUFFER-LOCAL was set at creation time, then
 `force-mode-line-update' is called in that buffer instead.  When
-the spinner is stopped, the timer is deactivated."))
-  (frames (spinner--type-to-frames type))
-  (counter 0)
-  (fps spinner-frames-per-second)
-  (timer (timer-create) :read-only)
-  (active-p nil)
-  (buffer (when buffer-local
-            (if (bufferp buffer-local)
-                buffer-local
-              (current-buffer)))))
+the spinner is stopped, the timer is deactivated."
+  (make-spinner type buffer-local fps))
 
 (defun spinner-print (spinner)
   "Return a string of the current frame of SPINNER.
