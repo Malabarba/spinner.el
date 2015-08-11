@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.3.1
+;; Version: 1.4
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -168,19 +168,20 @@ own spinner animations."
 (defstruct (spinner
             (:copier nil)
             (:conc-name spinner--)
-            (:constructor make-spinner (&optional type buffer-local fps)))
+            (:constructor make-spinner (&optional type buffer-local frames-per-second delay-before-start)))
   (frames (spinner--type-to-frames type))
   (counter 0)
-  (fps spinner-frames-per-second)
+  (fps (or frames-per-second spinner-frames-per-second))
   (timer (timer-create) :read-only)
   (active-p nil)
   (buffer (when buffer-local
             (if (bufferp buffer-local)
                 buffer-local
-              (current-buffer)))))
+              (current-buffer))))
+  (delay (or delay-before-start 0)))
 
 ;;;###autoload
-(defun spinner-create (&optional type buffer-local fps)
+(defun spinner-create (&optional type buffer-local fps delay)
   "Create a spinner of the given TYPE.
 The possible TYPEs are described in `spinner--type-to-frames'.
 
@@ -195,8 +196,13 @@ When started, in order to function properly, the spinner runs a
 timer which periodically calls `force-mode-line-update' in the
 curent buffer.  If BUFFER-LOCAL was set at creation time, then
 `force-mode-line-update' is called in that buffer instead.  When
-the spinner is stopped, the timer is deactivated."
-  (make-spinner type buffer-local fps))
+the spinner is stopped, the timer is deactivated.
+
+DELAY, if given, is the number of seconds to wait after starting
+the spinner before actually displaying it. It is safe to cancel
+the spinner before this time, in which case it won't display at
+all."
+  (make-spinner type buffer-local fps delay))
 
 (defun spinner-print (spinner)
   "Return a string of the current frame of SPINNER.
@@ -204,8 +210,9 @@ If SPINNER is nil, just return nil.
 Designed to be used in the mode-line with:
     (:eval (spinner-print some-spinner))"
   (when (and spinner (spinner--active-p spinner))
-    (elt (spinner--frames spinner)
-         (spinner--counter spinner))))
+    (let ((frame (spinner--counter spinner)))
+      (when (>= frame 0)
+        (elt (spinner--frames spinner) frame)))))
 
 (defun spinner--timer-function (spinner)
   "Function called to update SPINNER.
@@ -216,7 +223,9 @@ stop the SPINNER's timer."
             (and buffer (not (buffer-live-p buffer))))
         (spinner-stop spinner)
       ;; Increment
-      (callf (lambda (x) (% (1+ x) (length (spinner--frames spinner))))
+      (callf (lambda (x) (if (< x 0)
+                        (1+ x)
+                      (% (1+ x) (length (spinner--frames spinner)))))
           (spinner--counter spinner))
       ;; Update mode-line.
       (if (buffer-live-p buffer)
@@ -225,15 +234,19 @@ stop the SPINNER's timer."
         (force-mode-line-update)))))
 
 (defun spinner--start-timer (spinner)
-  "Start a SPINNER's timer at FPS frames per second."
+  "Start a SPINNER's timer."
   (let ((old-timer (spinner--timer spinner)))
     (when (timerp old-timer)
       (cancel-timer old-timer))
 
     (setf (spinner--active-p spinner) t)
+
+    (unless (ignore-errors (> (spinner--fps spinner) 0))
+      (error "A spinner's FPS must be a positive number"))
+    (setf (spinner--counter spinner) (- (* (or (spinner--delay spinner) 0)
+                                    (spinner--fps spinner))))
     ;; Create timer.
-    (let* ((repeat (/ 1.0 (or (spinner--fps spinner)
-                              spinner-frames-per-second)))
+    (let* ((repeat (/ 1.0 (spinner--fps spinner)))
            (time (timer-next-integral-multiple-of-time (current-time) repeat))
            ;; Create the timer as a lex variable so it can cancel itself.
            (timer (spinner--timer spinner)))
@@ -246,7 +259,7 @@ stop the SPINNER's timer."
 
 ;;; The main functions
 ;;;###autoload
-(defun spinner-start (&optional type-or-object fps)
+(defun spinner-start (&optional type-or-object fps delay)
   "Start a mode-line spinner of given TYPE-OR-OBJECT.
 If TYPE-OR-OBJECT is an object created with `make-spinner',
 simply activate it.  This method is designed for minor modes, so
@@ -265,13 +278,16 @@ anywhere to stop this spinner.  You can also call `spinner-stop'
 in the same buffer where the spinner was created.
 
 FPS, if given, is the number of desired frames per second.
-Default is `spinner-frames-per-second'."
+Default is `spinner-frames-per-second'.
+
+DELAY, if given, is the number of seconds to wait until actually
+displaying the spinner. It is safe to cancel the spinner before
+this time, in which case it won't display at all."
   (unless (spinner-p type-or-object)
     ;; Choose type.
     (if (spinner-p spinner-current)
-        (setf (spinner--frames spinner-current)
-              (spinner--type-to-frames type-or-object))
-      (setq spinner-current (make-spinner type-or-object (current-buffer) fps)))
+        (setf (spinner--frames spinner-current) (spinner--type-to-frames type-or-object))
+      (setq spinner-current (make-spinner type-or-object (current-buffer) fps delay)))
     (setq type-or-object spinner-current)
     ;; Maybe add to mode-line.
     (unless (memq 'spinner--mode-line-construct mode-line-process)
@@ -281,6 +297,7 @@ Default is `spinner-frames-per-second'."
 
   ;; Create timer.
   (when fps (setf (spinner--fps type-or-object) fps))
+  (when delay (setf (spinner--delay type-or-object) delay))
   (spinner--start-timer type-or-object))
 
 (defun spinner-start-print (spinner)
