@@ -255,8 +255,8 @@ stop the SPINNER's timer."
 
     (unless (ignore-errors (> (spinner--fps spinner) 0))
       (error "A spinner's FPS must be a positive number"))
-    (setf (spinner--counter spinner) (- (* (or (spinner--delay spinner) 0)
-                                    (spinner--fps spinner))))
+    (setf (spinner--counter spinner) (round (- (* (or (spinner--delay spinner) 0)
+                                           (spinner--fps spinner)))))
     ;; Create timer.
     (let* ((repeat (/ 1.0 (spinner--fps spinner)))
            (time (timer-next-integral-multiple-of-time (current-time) repeat))
