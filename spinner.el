@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.5
+;; Version: 1.6
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -122,6 +122,18 @@
   "Predefined alist of spinners.
 Each car is a symbol identifying the spinner, and each cdr is a
 vector, the spinner itself.")
+
+(defun spinner-make-progress-bar (width &optional char)
+  "Return a vector of strings of the given WIDTH.
+The vector is a valid spinner type and is similar to the
+`progress-bar' spinner, except without the sorrounding brackets.
+CHAR is the character to use for the moving bar (defaults to =)."
+  (let ((whole-string (concat (make-string (1- width) ?\s)
+                              (make-string 4 (or char ?=))
+                              (make-string width ?\s))))
+    (thread-last (mapcar (lambda (n) (substring whole-string n (+ n width)))
+                         (number-sequence (+ width 3) 0 -1))
+      (apply #'vector))))
 
 (defvar spinner-current nil
   "Spinner curently being displayed on the `mode-line-process'.")
