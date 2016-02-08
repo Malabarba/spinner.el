@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.6
+;; Version: 1.7
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -319,13 +319,16 @@ this time, in which case it won't display at all."
   (spinner-print spinner))
 
 (defun spinner-stop (&optional spinner)
-  "Stop the current buffer's spinner."
-  (let* ((spinner (or spinner spinner-current))
-         (timer (spinner--timer spinner)))
-    (when (timerp timer)
-      (cancel-timer timer))
-    (setf (spinner--active-p spinner) nil)
-    (force-mode-line-update)))
+  "Stop SPINNER, defaulting to the current buffer's spinner.
+It is always safe to call this function, even if there is no
+active spinner."
+  (let ((spinner (or spinner spinner-current)))
+    (when (spinner-p spinner)
+      (let ((timer (spinner--timer spinner)))
+        (when (timerp timer)
+          (cancel-timer timer)))
+      (setf (spinner--active-p spinner) nil)
+      (force-mode-line-update))))
 
 (provide 'spinner)
 
