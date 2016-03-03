@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.7
+;; Version: 1.7.1
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -131,9 +131,8 @@ CHAR is the character to use for the moving bar (defaults to =)."
   (let ((whole-string (concat (make-string (1- width) ?\s)
                               (make-string 4 (or char ?=))
                               (make-string width ?\s))))
-    (thread-last (mapcar (lambda (n) (substring whole-string n (+ n width)))
-                         (number-sequence (+ width 3) 0 -1))
-      (apply #'vector))))
+    (apply #'vector (mapcar (lambda (n) (substring whole-string n (+ n width)))
+                            (number-sequence (+ width 3) 0 -1)))))
 
 (defvar spinner-current nil
   "Spinner curently being displayed on the `mode-line-process'.")
