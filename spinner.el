@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.7.1
+;; Version: 1.7.2
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -183,7 +183,7 @@ own spinner animations."
   (frames (spinner--type-to-frames type))
   (counter 0)
   (fps (or frames-per-second spinner-frames-per-second))
-  (timer (timer-create) :read-only)
+  (timer (timer-create) :read-only t)
   (active-p nil)
   (buffer (when buffer-local
             (if (bufferp buffer-local)
