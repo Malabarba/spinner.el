@@ -183,7 +183,7 @@ own spinner animations."
   (frames (spinner--type-to-frames type))
   (counter 0)
   (fps (or frames-per-second spinner-frames-per-second))
-  (timer (timer-create) :read-only t)
+  (timer (timer-create))
   (active-p nil)
   (buffer (when buffer-local
             (if (bufferp buffer-local)
