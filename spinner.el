@@ -3,7 +3,7 @@
 ;; Copyright (C) 2015 Free Software Foundation, Inc.
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
-;; Version: 1.7.2
+;; Version: 1.7.3
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
