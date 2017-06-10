@@ -118,7 +118,7 @@
     (box-in-box . ["◰" "◳" "◲" "◱"])
     (box-in-circle . ["◴" "◷" "◶" "◵"])
     (half-circle . ["◐" "◓" "◑" "◒"])
-    (moon . ["🌑" "🌘" "🌖" "🌕" "🌔" "🌒"]))
+    (moon . ["🌑" "🌘" "🌗" "🌖" "🌕" "🌔" "🌓" "🌒"]))
   "Predefined alist of spinners.
 Each car is a symbol identifying the spinner, and each cdr is a
 vector, the spinner itself.")
