@@ -301,7 +301,8 @@ this time, in which case it won't display at all."
       (setq spinner-current (make-spinner type-or-object (current-buffer) fps delay)))
     (setq type-or-object spinner-current)
     ;; Maybe add to mode-line.
-    (unless (memq 'spinner--mode-line-construct mode-line-process)
+    (unless (and (listp mode-line-process)
+                 (memq 'spinner--mode-line-construct mode-line-process))
       (setq mode-line-process
             (list (or mode-line-process "")
                   'spinner--mode-line-construct))))
