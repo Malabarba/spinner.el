@@ -4,6 +4,7 @@
 
 ;; Author: Artur Malabarba <emacs@endlessparentheses.com>
 ;; Version: 1.7.3
+;; Package-Requires: ((emacs "24.3"))
 ;; URL: https://github.com/Malabarba/spinner.el
 ;; Keywords: processes mode-line
 
@@ -98,7 +99,7 @@
 
 ;;; Code:
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 
 (defconst spinner-types
   '((3-line-clock . ["┤" "┘" "┴" "└" "├" "┌" "┬" "┐"])
@@ -176,10 +177,10 @@ own spinner animations."
    ((symbolp type) (cdr (assq type spinner-types)))
    (t (error "Unknown spinner type: %s" type))))
 
-(defstruct (spinner
-            (:copier nil)
-            (:conc-name spinner--)
-            (:constructor make-spinner (&optional type buffer-local frames-per-second delay-before-start)))
+(cl-defstruct (spinner
+               (:copier nil)
+               (:conc-name spinner--)
+               (:constructor make-spinner (&optional type buffer-local frames-per-second delay-before-start)))
   (frames (spinner--type-to-frames type))
   (counter 0)
   (fps (or frames-per-second spinner-frames-per-second))
@@ -234,9 +235,9 @@ stop the SPINNER's timer."
             (and buffer (not (buffer-live-p buffer))))
         (spinner-stop spinner)
       ;; Increment
-      (callf (lambda (x) (if (< x 0)
-                        (1+ x)
-                      (% (1+ x) (length (spinner--frames spinner)))))
+      (cl-callf (lambda (x) (if (< x 0)
+                           (1+ x)
+                         (% (1+ x) (length (spinner--frames spinner)))))
           (spinner--counter spinner))
       ;; Update mode-line.
       (if (buffer-live-p buffer)
