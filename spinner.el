@@ -333,4 +333,7 @@ active spinner."
 
 (provide 'spinner)
 
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
 ;;; spinner.el ends here
